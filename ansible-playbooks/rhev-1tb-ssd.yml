@@ -29,6 +29,7 @@
     with_items:
       - gdisk
       - parted
+      - vdsm
 
   # This is where the RHEV virtual machines will reside
   - name: Make /vms dir and set permissions
