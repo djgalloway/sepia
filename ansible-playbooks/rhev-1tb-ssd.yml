@@ -1,10 +1,12 @@
 ---
-### This playbook is useful for setting up a baremetal Irvingi host
-### as a baremetal host to serve Jenkins VMs.  Expects a RHEL7 image
+### This playbook is useful for setting up a baremetal hosts (irvingi or senta)
+### as a RHEL Hypervisor to serve Jenkins VMs.  Expects a RHEL7 image
 ### already subscribed to RHSM and had ceph-cm-ansible common role
 ### ran against it.
 
-- hosts: irvingi
+- hosts:
+    - irvingi
+    - senta
   vars:
     # Default to configure /vms disk
     configure_disk: true
