@@ -1,0 +1,8 @@
+---
+### This playbook configures a CentOS 7 host to serve as an NTP server
+
+- hosts:
+    - nameserver
+  roles:
+    - ntp-server
+  become: true
