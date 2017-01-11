@@ -98,6 +98,13 @@
       opts: defaults
       state: mounted
 
+  - name: Attempt to set owner:group permissions again
+    file:
+      state: directory
+      path: /vms
+      owner: 36
+      group: 36
+
   - name: Copy RHEV SSH key to root's authorized_keys
     authorized_key:
       user: root
