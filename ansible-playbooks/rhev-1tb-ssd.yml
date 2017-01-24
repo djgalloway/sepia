@@ -31,6 +31,12 @@
       - parted
       - vdsm
 
+  - name: Find 1TB SSD
+    set_fact:
+      vm_ssd: "{{ item.key }}"
+    with_dict: "{{ ansible_devices }}"
+    when: item.value.model == "Samsung SSD 850"
+
   # This is where the RHEV virtual machines will reside
   - name: Make /vms dir and set permissions
     file:
@@ -38,12 +44,6 @@
       path: /vms
       owner: vdsm
       group: kvm
-
-  - name: Find 1TB SSD
-    set_fact:
-      vm_ssd: "{{ item.key }}"
-    with_dict: "{{ ansible_devices }}"
-    when: item.value.model == "Samsung SSD 850"
 
   # Unmount /vms so configure_disk is set to true
   - name: Unmount 1TB SSD if we're forcefully reconfiguring
