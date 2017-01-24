@@ -36,8 +36,8 @@
     file:
       state: directory
       path: /vms
-      owner: 36
-      group: 36
+      owner: vdsm
+      group: kvm
 
   - name: Find 1TB SSD
     set_fact:
