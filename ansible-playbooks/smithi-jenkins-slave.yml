@@ -1,0 +1,42 @@
+---
+### This playbook is useful for setting up a smithi as Jenkins slave
+### for use with jenkins.ceph.com.
+### Primarily, this just sets up the NVMe device for /home/jenkins-build because fast.
+### NOTE: Not idempotent!  This will erase any data in /home/jenkins-build
+
+- hosts:
+    - smithi
+  become: true
+  tasks:
+
+  - name: Check if /home/jenkins-build already exists
+    stat:
+      path: /home/jenkins-build
+    register: stat_output
+
+  - name: Unmount /home/jenkins-build if dir exists
+    mount:
+      path: /home/jenkins-build
+      state: unmounted
+    when: stat_output.stat.exists
+
+  - name: Zap NVMe disk
+    command: "sgdisk -Z /dev/nvme0n1"
+
+  - name: Make filesystem on NVMe disk
+    filesystem:
+      fstype: xfs
+      dev: "/dev/nvme0n1"
+
+  # https://github.com/ceph/ceph-build/blob/master/ansible/slave_libvirt.yml can still use this
+  - name: Make jenkins-build home dir
+    file:
+      path: "/home/jenkins-build"
+      state: directory
+
+  - name: Mount NVMe disk
+    mount:
+      path: "/home/jenkins-build"
+      src: "/dev/nvme0n1"
+      fstype: xfs
+      state: mounted
