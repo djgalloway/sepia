@@ -9,6 +9,13 @@
   become: true
   tasks:
 
+  - name: Install deps
+    package:
+      state: latest
+      name: "{{ item }}"
+    with_items:
+      - xfsprogs
+
   - name: Check if /home/jenkins-build already exists
     stat:
       path: /home/jenkins-build
