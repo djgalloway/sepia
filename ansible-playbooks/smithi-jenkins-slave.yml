@@ -9,6 +9,13 @@
   become: true
   tasks:
 
+  - name: Remove all non-admin users
+    user:
+      name: "{{ item.name }}"
+      state: absent
+      remove: yes
+    with_items: "{{ lab_users }}"
+
   - name: Install deps
     package:
       state: latest
