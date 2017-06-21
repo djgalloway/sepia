@@ -14,7 +14,7 @@
       name: "{{ item.name }}"
       state: absent
       remove: yes
-    with_items: "{{ lab_users }}"
+    with_items: "{{ lab_users }} + [{'name': 'ubuntu'}]"
 
   - name: Install deps
     package:
