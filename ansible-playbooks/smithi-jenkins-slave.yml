@@ -1,12 +1,14 @@
 ---
 ### This playbook is useful for setting up a smithi as Jenkins slave
-### for use with jenkins.ceph.com.
-### Primarily, this just sets up the NVMe device for /home/jenkins-build because fast.
-### NOTE: Not idempotent!  This will erase any data in /home/jenkins-build
+### for use with 2.jenkins.ceph.com.
+### Primarily, this just sets up the NVMe device to be mounted at {{ mount_dir }}
+### NOTE: Not idempotent!  This will erase any data at {{ mount_dir }}
 
 - hosts:
     - smithi
   become: true
+  vars:
+    mount_dir: "/var/lib/libvirt/images"
   tasks:
 
   - name: Remove all non-admin users
@@ -23,16 +25,18 @@
     with_items:
       - xfsprogs
 
-  - name: Check if /home/jenkins-build already exists
-    stat:
-      path: /home/jenkins-build
-    register: stat_output
+  - name: Stop Jenkins slave service in case it's running
+    service:
+      name: jenkins
+      state: stopped
+    failed_when: false
 
-  - name: Unmount /home/jenkins-build if dir exists
+  - name: "Unmount /dev/nvme0n1"
     mount:
-      path: /home/jenkins-build
+      path: "{{ item.mount }}"
       state: unmounted
-    when: stat_output.stat.exists
+    with_items: "{{ ansible_mounts }}"
+    when: item.device == "/dev/nvme0n1"
 
   - name: Zap NVMe disk
     command: "sgdisk -Z /dev/nvme0n1"
@@ -42,15 +46,14 @@
       fstype: xfs
       dev: "/dev/nvme0n1"
 
-  # https://github.com/ceph/ceph-build/blob/master/ansible/slave_libvirt.yml can still use this
-  - name: Make jenkins-build home dir
+  - name: "Make {{ mount_dir }} dir"
     file:
-      path: "/home/jenkins-build"
+      path: "{{ mount_dir }}"
       state: directory
 
   - name: Mount NVMe disk
     mount:
-      path: "/home/jenkins-build"
+      path: "{{ mount_dir }}"
       src: "/dev/nvme0n1"
       fstype: xfs
       state: mounted
