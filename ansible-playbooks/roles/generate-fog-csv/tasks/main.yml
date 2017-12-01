@@ -1,5 +1,0 @@
----
-- template:
-    src: csv.j2
-    dest: /tmp/ansible_out.csv
-  delegate_to: localhost
