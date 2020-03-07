@@ -1,0 +1,29 @@
+### This playbook configures a braggi host to be a Jenkins slave.
+
+- hosts:
+    - braggi
+  become: true
+  tasks:
+
+  - name: Create jenkins-build home dir
+    file:
+      path: /home/jenkins-build
+      state: directory
+
+  - name: Install xfsprogs (Ubuntu)
+    package:
+      name: xfsprogs
+      state: latest
+    when: ansible_os_family == "Debian"
+
+  - name: Configure sdb
+    filesystem:
+      fstype: xfs
+      dev: /dev/sdb
+
+  - name: Mount sdb
+    mount:
+      path: /home/jenkins-build
+      src: /dev/sdb
+      state: mounted
+      fstype: xfs
