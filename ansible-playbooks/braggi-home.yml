@@ -16,6 +16,9 @@
       state: latest
     when: ansible_os_family == "Debian"
 
+  - name: Zap sdb
+    command: sgdisk -Z /dev/sdb
+
   - name: Configure sdb
     filesystem:
       fstype: xfs
