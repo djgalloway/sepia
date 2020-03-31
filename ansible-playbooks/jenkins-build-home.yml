@@ -2,8 +2,17 @@
 
 - hosts:
     - braggi
+    - incerta
   become: true
   tasks:
+
+  - set_fact:
+      disk: /dev/sdb
+    when: '"braggi" in ansible_hostname'
+
+  - set_fact:
+      disk: /dev/nvme0n1
+    when: '"incerta" in ansible_hostname'
 
   - name: Create jenkins-build home dir
     file:
@@ -19,22 +28,22 @@
   - name: Unmount
     mount:
       path: /home/jenkins-build
-      src: /dev/sdb
+      src: "{{ disk }}"
       state: unmounted
       fstype: xfs
     ignore_errors: true
 
-  - name: Zap sdb
-    command: sgdisk -Z /dev/sdb
+  - name: Zap disk
+    command: "sgdisk -Z {{ disk }}"
 
-  - name: Configure sdb
+  - name: Configure disk
     filesystem:
       fstype: xfs
-      dev: /dev/sdb
+      dev: "{{ disk }}"
 
-  - name: Mount sdb
+  - name: Mount disk
     mount:
       path: /home/jenkins-build
-      src: /dev/sdb
+      src: "{{ disk }}"
       state: mounted
       fstype: xfs
