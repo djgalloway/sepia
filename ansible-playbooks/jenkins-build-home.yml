@@ -3,6 +3,7 @@
 - hosts:
     - braggi
     - incerta
+    - irvingi
   become: true
   tasks:
 
@@ -13,6 +14,10 @@
   - set_fact:
       disk: /dev/nvme0n1
     when: '"incerta" in ansible_hostname'
+
+  - set_fact:
+      disk: /dev/sdc
+    when: '"irvingi" in ansible_hostname'
 
   - name: Create jenkins-build home dir
     file:
