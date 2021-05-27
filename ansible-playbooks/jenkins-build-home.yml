@@ -4,12 +4,13 @@
     - braggi
     - incerta
     - irvingi
+    - adami
   become: true
   tasks:
 
   - set_fact:
       disk: /dev/sdb
-    when: '"braggi" in ansible_hostname'
+    when: '"braggi" in ansible_hostname' or '"adami" in ansible_hostname'
 
   - set_fact:
       disk: /dev/nvme0n1
