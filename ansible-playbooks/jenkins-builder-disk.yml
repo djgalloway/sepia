@@ -10,19 +10,24 @@
 
   - set_fact:
       disk: /dev/sdb
+      mount_point: /home/jenkins-build
     when: '"braggi" in ansible_hostname or "adami" in ansible_hostname'
 
   - set_fact:
       disk: /dev/nvme0n1
+      mount_point: /home/jenkins-build
     when: '"incerta" in ansible_hostname'
 
+# Setting the mountpoint to libvirt/images on irvinigi because I'm adding two
+# right now as CentOS7 Vagrant builders.
   - set_fact:
       disk: /dev/sdc
+      mount_point: /var/lib/libvirt/images
     when: '"irvingi" in ansible_hostname'
 
-  - name: Create jenkins-build home dir
+  - name: "Create {{ mount_point }} home dir"
     file:
-      path: /home/jenkins-build
+      path: "{{ mount_point }}"
       state: directory
 
   - name: Install xfsprogs (Ubuntu)
@@ -33,7 +38,7 @@
 
   - name: Unmount
     mount:
-      path: /home/jenkins-build
+      path: "{{ mount_point }}"
       src: "{{ disk }}"
       state: unmounted
       fstype: xfs
@@ -49,7 +54,7 @@
 
   - name: Mount disk
     mount:
-      path: /home/jenkins-build
+      path: "{{ mount_point }}"
       src: "{{ disk }}"
       state: mounted
       fstype: xfs
